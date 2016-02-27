@@ -22,8 +22,8 @@ func main() {
 
 	fmt.Println("Updates")
 	for _, pathInfo := range pathInfos {
-		if IsDirectoryUpdateAfterTime(pathInfo.path, checkTime) {
-			fmt.Printf(" > %s (%s)\n", pathInfo.categoty, pathInfo.path)
+		if isUpdate, modTime := IsDirectoryUpdateAfterTime(pathInfo.path, checkTime); isUpdate {
+			fmt.Printf(" > %s [%s](%s)\n", pathInfo.categoty, pathInfo.path, modTime.Format("2006-01-02"))
 		}
 	}
 
@@ -61,31 +61,38 @@ func isTime1AfterTime2(time1 time.Time, time2 time.Time) bool {
 	return time1.After(time2) || time1.Equal(time2)
 }
 
-func IsDirectoryUpdateAfterTime(directoryPath string, time time.Time) bool {
+func IsDirectoryUpdateAfterTime(directoryPath string, checkTime time.Time) (isUpdate bool, modTime time.Time) {
+	isUpdate = false
+	modTime = time.Now()
+
 	if directoryPath == "" {
-		return false
+		return
 	}
 
 	folderInfo, error := os.Stat(directoryPath)
 	if error != nil {
 		fmt.Println(error.Error())
-		return false
+		return
 	}
 
 	subDirectoriesPaths := SubDirectoriesPathsFromPath(directoryPath)
-	isMeUpdate := isTime1AfterTime2(folderInfo.ModTime(), time)
+	isMeUpdate := isTime1AfterTime2(folderInfo.ModTime(), checkTime)
 
 	if isMeUpdate && len(subDirectoriesPaths) == 0 {
-		return true
+		isUpdate = true
+		modTime = folderInfo.ModTime()
+		return
 	}
 
 	for _, subDirectoryPath := range subDirectoriesPaths {
-		if IsDirectoryUpdateAfterTime(subDirectoryPath, time) {
-			return true
+		if isSubUpdate, subUpdateTime := IsDirectoryUpdateAfterTime(subDirectoryPath, checkTime); isSubUpdate {
+			isUpdate = true
+			modTime = subUpdateTime
+			return
 		}
 	}
 
-	return false
+	return
 }
 
 func SubDirectoriesPathsFromPath(path string) []string {
