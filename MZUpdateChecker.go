@@ -23,7 +23,8 @@ func main() {
 	fmt.Println("Updates")
 	for _, pathInfo := range pathInfos {
 		if isUpdate, modTime := IsDirectoryUpdateAfterTime(pathInfo.path, checkTime); isUpdate {
-			fmt.Printf(" > %s [%s](%s)\n", pathInfo.categoty, pathInfo.path, modTime.Format("2006-01-02"))
+			fmt.Printf("%s (last: %s)\n", pathInfo.categoty, modTime.Format("2006-01-02"))
+			fmt.Printf(" (path: %s)\n", pathInfo.path)
 		}
 	}
 
