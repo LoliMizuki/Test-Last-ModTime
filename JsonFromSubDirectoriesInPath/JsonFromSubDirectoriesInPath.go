@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	// targetPath = "C:/CG tachi [~2012]/Forever"
+	targetPath     = "C:/CG tachi [~2012]/Forever"
 	categoryPrefix = "CG tachi/Foreve"
 	// targetPath     = "/Users/inabamizuki/Desktop/iOS/src/lolimizuki/Projects"
 )
