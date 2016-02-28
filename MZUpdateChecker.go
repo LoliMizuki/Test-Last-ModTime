@@ -15,15 +15,19 @@ type PathInfo struct {
 	path     string
 }
 
+const (
+	pathInfosPath = "pathInfos.json"
+)
+
 func main() {
-	checkTime, pathInfos := ParseInfoFromJson("pathInfos.json")
+	checkTime, pathInfos := ParseInfoFromJson(pathInfosPath)
 	fmt.Println("Check updates after:", checkTime)
 	fmt.Println("")
 
 	fmt.Println("Updates")
 	for _, pathInfo := range pathInfos {
 		if isUpdate, modTime := IsDirectoryUpdateAfterTime(pathInfo.path, checkTime); isUpdate {
-			fmt.Printf("%s (last: %s)\n", pathInfo.categoty, modTime.Format("2006-01-02"))
+			// fmt.Printf("%s (last: %s)\n", pathInfo.categoty, modTime.Format("2006-01-02"))
 			fmt.Printf(" (path: %s)\n", pathInfo.path)
 		}
 	}
@@ -50,7 +54,7 @@ func ParseInfoFromJson(jsonPath string) (checkTime time.Time, pathInfos []PathIn
 	pathInfos = make([]PathInfo, len(rawPathInfosArray))
 	for _, raw := range rawPathInfosArray {
 		info := raw.(map[string]interface{})
-		pathInfo := PathInfo{info["categoty"].(string), info["path"].(string)}
+		pathInfo := PathInfo{info["category"].(string), info["path"].(string)}
 
 		pathInfos = append(pathInfos, pathInfo)
 	}
