@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	targetPath     = "C:/CG tachi [~2012]/Forever"
-	categoryPrefix = "CG tachi/Foreve"
+	// targetPath     = "C:/CG tachi [~2012]/Forever"
+	targetPath = "C:/Users/Mizuki/Desktop/temp/E-Animations"
+	// targetPath     = "C:/CG tachi [~2012]/H-Game"
+	categoryPrefix = ""
 	// targetPath     = "/Users/inabamizuki/Desktop/iOS/src/lolimizuki/Projects"
 )
 
