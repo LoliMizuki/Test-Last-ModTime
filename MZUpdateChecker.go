@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -19,16 +18,12 @@ type PathInfo struct {
 
 const (
 	pathInfosFolderPath = "PathInfos"
-	// pathInfosPath       = "pathInfos.json"
 )
 
 func main() {
 	pathInfosPath := ShowAllPathInfoOptionsAndGetPath()
 	CheckAndReport(pathInfosPath)
 	AnyKeyToExit()
-
-	aa := strings.Split("aaaa", "b")
-	fmt.Println(aa)
 }
 
 // Main Processes
