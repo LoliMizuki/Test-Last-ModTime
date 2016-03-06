@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -16,11 +18,48 @@ type PathInfo struct {
 }
 
 const (
-	pathInfosPath = "pathInfos.json"
+	pathInfosFolderPath = "PathInfos"
+	// pathInfosPath       = "pathInfos.json"
 )
 
 func main() {
-	checkTime, pathInfos := ParseInfoFromJson(pathInfosPath)
+	pathInfosPath := ShowAllPathInfoOptionsAndGetPath()
+	CheckAndReport(pathInfosPath)
+	AnyKeyToExit()
+
+	aa := strings.Split("aaaa", "b")
+	fmt.Println(aa)
+}
+
+// Main Processes
+
+func ShowAllPathInfoOptionsAndGetPath() string {
+	subFilePaths := SubFilesPathsInDirectoryPath(pathInfosFolderPath)
+
+	fmt.Println("選擇一個妳要的:")
+	for index, filePath := range subFilePaths {
+		fmt.Printf("  (%d) %s\n", index, filePath)
+	}
+
+	for {
+		reader := bufio.NewReader(os.Stdin)
+		inputByte, _ := reader.ReadByte()
+
+		input := string(inputByte)
+		readOption, _ := strconv.Atoi(input)
+
+		if 0 <= readOption && readOption < len(subFilePaths) {
+			return subFilePaths[readOption]
+		} else {
+			fmt.Println("再給妳一次機會")
+		}
+	}
+
+	return ""
+}
+
+func CheckAndReport(pathInfosPath string) {
+	checkTime, pathInfos := CheckTimeAndParseInfoFromJsonFilePath(pathInfosPath)
 	fmt.Println("Check updates after:", checkTime)
 	fmt.Println("")
 
@@ -31,13 +70,17 @@ func main() {
 			fmt.Printf(" (path: %s)\n", pathInfo.path)
 		}
 	}
+}
 
+func AnyKeyToExit() {
 	fmt.Println("任意鍵結束這一切 = =")
 	reader := bufio.NewReader(os.Stdin)
 	reader.ReadString('\n')
 }
 
-func ParseInfoFromJson(jsonPath string) (checkTime time.Time, pathInfos []PathInfo) {
+//  Compare Functions
+
+func CheckTimeAndParseInfoFromJsonFilePath(jsonPath string) (checkTime time.Time, pathInfos []PathInfo) {
 	jsonByte, error := ioutil.ReadFile(jsonPath)
 	if error != nil {
 		log.Fatalln(error.Error())
@@ -80,7 +123,7 @@ func IsDirectoryUpdateAfterTime(directoryPath string, checkTime time.Time) (isUp
 		return
 	}
 
-	subDirectoriesPaths := SubDirectoriesPathsFromPath(directoryPath)
+	subDirectoriesPaths := SubDirectoryPathsInDirectoryPath(directoryPath)
 	isMeUpdate := isTime1AfterTime2(folderInfo.ModTime(), checkTime)
 
 	if isMeUpdate && len(subDirectoriesPaths) == 0 {
@@ -100,8 +143,16 @@ func IsDirectoryUpdateAfterTime(directoryPath string, checkTime time.Time) (isUp
 	return
 }
 
-func SubDirectoriesPathsFromPath(path string) []string {
-	subComponents, _ := ioutil.ReadDir(path)
+// Support
+
+func SubDirectoryPathsInDirectoryPath(path string) []string {
+	subComponents, error := ioutil.ReadDir(path)
+
+	if os.IsNotExist(error) {
+		fmt.Println("Error: search path is not exist")
+		return make([]string, 0)
+	}
+
 	subDirectoryPaths := []string{}
 
 	for _, s := range subComponents {
@@ -113,4 +164,25 @@ func SubDirectoriesPathsFromPath(path string) []string {
 	}
 
 	return subDirectoryPaths
+}
+
+func SubFilesPathsInDirectoryPath(path string) []string {
+	subComponents, error := ioutil.ReadDir(path)
+
+	if os.IsNotExist(error) {
+		fmt.Println("Error: search path is not exist")
+		return make([]string, 0)
+	}
+
+	subFilePaths := []string{}
+
+	for _, s := range subComponents {
+		if s.IsDir() {
+			continue
+		}
+		subFilePath := path + "/" + s.Name()
+		subFilePaths = append(subFilePaths, subFilePath)
+	}
+
+	return subFilePaths
 }
